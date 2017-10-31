@@ -56,8 +56,7 @@ When installed, you can invoke ``ip2geotools`` from the command-line:
 
 Where:
 
-* ``ip2geotools``: is the script when installed in your environment, in
-   development you could use ``python -m ip2geotools`` instead
+* ``ip2geotools``: is the script when installed in your environment, in development you could use ``python -m ip2geotools`` instead
 
 * ``IP_ADDRESS``: IP address to be checked
 
