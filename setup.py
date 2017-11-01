@@ -3,7 +3,7 @@
 
 import io
 import os
-from setuptools import setup
+from setuptools import setup, find_packages
 import ip2geotools
 
 
@@ -27,7 +27,7 @@ setup(
     author_email=ip2geotools.__author_email__,
     url=ip2geotools.__url__,
     download_url=ip2geotools.__url__ + '/archive/' + ip2geotools.__version__ + '.tar.gz',
-    packages=['ip2geotools'],
+    packages=find_packages(exclude=['docs', 'tests', 'tests.*']),
     package_data={'': ['LICENSE']},
     package_dir={'ip2geotools': 'ip2geotools'},
     install_requires=requirements,

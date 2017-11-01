@@ -67,8 +67,7 @@ class Command(object):
                        author=ip2geotools.__author__,
                        author_email=ip2geotools.__author_email__),
             formatter_class=argparse.RawDescriptionHelpFormatter,
-            add_help=True,
-            allow_abbrev=True)
+            add_help=True)
 
         parser.add_argument('IP_ADDRESS',
                             help='IP address to be checked')

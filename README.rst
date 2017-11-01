@@ -156,7 +156,7 @@ Following classes access many different noncommercial and commercial geolocation
 Requirements
 ------------
 
-This code requires Python 3+ and several other packages listed in ``requirements.txt``.
+This code requires Python 3.3+ and several other packages listed in ``requirements.txt``.
 
 Support
 -------
