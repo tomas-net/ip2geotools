@@ -189,28 +189,13 @@ class Command(object):
         except LocationError as e:
             # print formatted output
             if arguments.format == 'json':
-                print(
-                    json.dumps(
-                        {
-                            'error_type': type(e).__name__,
-                            'error_message': e.__str__()
-                        }
-                    )
-                )
+                print(e.to_json())
             elif arguments.format == 'xml':
-                print(
-                    dicttoxml.dicttoxml(
-                        {
-                            'error_type': type(e).__name__,
-                            'error_message': e.__str__()
-                        },
-                        custom_root='ip_location',
-                        attr_type=False).decode()
-                )
+                print(e.to_xml())
             elif arguments.format == 'csv-space':
-                print('%s %s' % (type(e).__name__, e.__str__()))
+                print(e.to_csv(' '))
             elif arguments.format == 'csv-tab':
-                print('%s\t%s' % (type(e).__name__, e.__str__()))
+                print(e.to_csv('\t'))
             elif arguments.format == 'inline':
                 print('%s: %s' % (type(e).__name__, e.__str__()))
 

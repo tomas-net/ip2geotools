@@ -7,6 +7,10 @@ These classes provide special exceptions used when accessing data from
 third-party geolocation databases.
 
 """
+# pylint: disable=missing-docstring
+
+import json
+import dicttoxml
 
 
 class LocationError(RuntimeError):
@@ -15,6 +19,25 @@ class LocationError(RuntimeError):
     :py:exc:`RuntimeError` and does not add any additional attributes.
 
     """
+
+    def to_json(self):
+        return json.dumps(
+            {
+                'error_type': type(self).__name__,
+                'error_message': self.__str__()
+            })
+
+    def to_xml(self):
+        return dicttoxml.dicttoxml(
+            {
+                'error_type': type(self).__name__,
+                'error_message': self.__str__()
+            },
+            custom_root='ip_location_error',
+            attr_type=False).decode()
+
+    def to_csv(self, delimiter):
+        return '%s%s%s' % (type(self).__name__, delimiter, self.__str__())
 
 
 class IpAddressNotFoundError(LocationError):

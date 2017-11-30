@@ -52,21 +52,21 @@ class DbIpWeb(IGeoIpDatabase):
         try:
             content = request.content.decode('utf-8')
             pq = pyquery.PyQuery(content)
-            parsed_ip = pq('html > body > div.container > h2') \
+            parsed_ip = pq('html > body div.container > h1') \
                         .text() \
                         .lower() \
                         .replace('ip address', '') \
                         .strip()
-            parsed_country = pq('html > body > div.container table:first tr:contains("Country") td') \
+            parsed_country = pq('html > body > div.container table tr:contains("Country") td') \
                              .text() \
                              .strip()
-            parsed_region = pq('html > body > div.container table:first tr:contains("State / Region") td') \
+            parsed_region = pq('html > body > div.container table tr:contains("State / Region") td') \
                             .text() \
                             .strip()
-            parsed_city = pq('html > body > div.container table:first tr:contains("City") td') \
+            parsed_city = pq('html > body > div.container table tr:contains("City") td') \
                           .text() \
                           .strip()
-            parsed_coords = pq('html > body > div.container table:first tr:contains("Coordinates") td') \
+            parsed_coords = pq('html > body > div.container table tr:contains("Coordinates") td') \
                             .text() \
                             .strip() \
                             .split(',')
@@ -447,7 +447,7 @@ class SkyhookContextAcceleratorIp(IGeoIpDatabase):
                                    + 'ip=' + quote(ip_address)
                                    + '&user=' + quote(username)
                                    + '&key=' + quote(password)
-                                   + '&version=2.0&prettyPrint=true',
+                                   + '&version=2.0',
                                    timeout=62)
         except:
             raise ServiceError()
@@ -455,15 +455,24 @@ class SkyhookContextAcceleratorIp(IGeoIpDatabase):
         # check for HTTP errors
         if request.status_code != 200:
             if request.status_code == 400:
-                raise PermissionRequiredError(ip_address)
-            elif request.status_code == 500:
                 raise InvalidRequestError()
+            elif request.status_code == 401:
+                raise PermissionRequiredError(ip_address)
             else:
                 raise ServiceError()
 
-        # parse content
+        # content decode
         try:
             content = request.content.decode('utf-8')
+        except:
+            raise InvalidResponseError()
+
+        # check for IP address not found error
+        if content == '{"data":{"ip":"' + ip_address + '"}}':
+            raise IpAddressNotFoundError(ip_address)
+
+        # parse content
+        try:
             content = json.loads(content)
         except:
             raise InvalidResponseError()
