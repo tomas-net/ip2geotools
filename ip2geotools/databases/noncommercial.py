@@ -208,15 +208,8 @@ class Freegeoip(IGeoIpDatabase):
         else:
             ip_location.latitude = None
             ip_location.longitude = None
-        """
-        ip_location = IpLocation(ip_address)
-        ip_location.city = "!!API DEPRECATED!!"
-        ip_location.country = "!!API DEPRECATED!!"
-        ip_location.ip_address = "!!API DEPRECATED!!"
-        ip_location.latitude = None
-        ip_location.longitude = None
-        
-        return ip_location
+        """        
+        raise ServiceError("API of Freegeoip database is deprecated!")
 
 class ipstack(IGeoIpDatabase):
     """
