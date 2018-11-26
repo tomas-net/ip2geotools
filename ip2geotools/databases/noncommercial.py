@@ -28,7 +28,7 @@ class DbIpCity(IGeoIpDatabase):
     """
 
     @staticmethod
-    def get(ip_address, api_key, db_path=None, username=None, password=None):
+    def get(ip_address, api_key="free", db_path=None, username=None, password=None):
         # process request
         try:
             request = requests.get('http://api.db-ip.com/v2/'
@@ -149,18 +149,79 @@ class HostIP(IGeoIpDatabase):
 
         return ip_location
 
-
 class Freegeoip(IGeoIpDatabase):
     """
     Class for accessing geolocation data provided by http://freegeoip.net/.
+    
+    !!API of Freegeoip database is deprecated!!
 
     """
 
     @staticmethod
     def get(ip_address, api_key=None, db_path=None, username=None, password=None):
         # process request
+        """
         try:
             request = requests.get('http://freegeoip.net/json/' + quote(ip_address),
+                                   timeout=62)
+        except:
+            raise ServiceError()
+
+        # check for HTTP errors
+        if request.status_code != 200:
+            if request.status_code == 404:
+                raise IpAddressNotFoundError(ip_address)
+            elif request.status_code == 500:
+                raise InvalidRequestError()
+            else:
+                raise ServiceError()
+
+        # parse content
+        try:
+            content = request.content.decode('utf-8')
+            content = json.loads(content)
+        except:
+            raise InvalidResponseError()
+
+        # prepare return value
+        ip_location = IpLocation(ip_address)
+
+        # format data
+        if content['country_code'] == '':
+            ip_location.country = None
+        else:
+            ip_location.country = content['country_code']
+
+        if content['region_name'] == '':
+            ip_location.region = None
+        else:
+            ip_location.region = content['region_name']
+
+        if content['city'] == '':
+            ip_location.city = None
+        else:
+            ip_location.city = content['city']
+
+        if content['latitude'] != '-' and content['longitude'] != '-':
+            ip_location.latitude = float(content['latitude'])
+            ip_location.longitude = float(content['longitude'])
+        else:
+            ip_location.latitude = None
+            ip_location.longitude = None
+        """        
+        raise ServiceError("API of Freegeoip database is deprecated!")
+
+class ipstack(IGeoIpDatabase):
+    """
+    Class for accessing geolocation data provided by http://ipstack.com/.
+
+    """
+
+    @staticmethod
+    def get(ip_address, api_key, db_path=None, username=None, password=None):
+        # process request
+        try:
+            request = requests.get('http://api.ipstack.com/' + quote(ip_address) + '?access_key=' + quote(api_key),
                                    timeout=62)
         except:
             raise ServiceError()
