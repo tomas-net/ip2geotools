@@ -134,3 +134,4 @@ class IpLocation(object):
             module=self.__module__,
             class_name=self.__class__.__name__,
             data=self.ip_address)
+

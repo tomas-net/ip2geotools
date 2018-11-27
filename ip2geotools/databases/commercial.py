@@ -53,9 +53,8 @@ class DbIpWeb(IGeoIpDatabase):
             content = request.content.decode('utf-8')
             pq = pyquery.PyQuery(content)
             parsed_ip = pq('html > body div.container > h1') \
+                        .remove('span') \
                         .text() \
-                        .lower() \
-                        .replace('ip address', '') \
                         .strip()
             parsed_country = pq('html > body > div.container table tr:contains("Country") td') \
                              .text() \
@@ -248,13 +247,18 @@ class Ip2LocationWeb(IGeoIpDatabase):
             parsed_ip = pq('html > body > div#main.container table:first tr:contains("IP Address") td:nth-child(2)') \
                         .text() \
                         .strip()
-            parsed_country = pq('html > body > div#main.container table:first tr:contains("Location") td:nth-child(2) img') \
+            parsed_country = pq('html > body > div#main.container table:first tr:contains("Country") td:nth-child(2) img') \
                              .attr('src') \
                              .strip() \
                              .replace('/images/flags/', '') \
                              .replace('.png', '') \
                              .upper()
-            parsed_location = pq('html > body > div#main.container table:first tr:contains("Location") td:nth-child(2)') \
+            parsed_region = pq('html > body > div#main.container table:first tr:contains("Region") td:nth-child(2)') \
+                              .eq(0) \
+                              .text() \
+                              .strip()
+            parsed_city = pq('html > body > div#main.container table:first tr:contains("City") td:nth-child(2)') \
+                              .eq(0) \
                               .text() \
                               .strip()
             parsed_coords = pq('html > body > div#main.container table:first tr:contains("Latitude & Longitude of City") td:nth-child(2)') \
@@ -273,8 +277,8 @@ class Ip2LocationWeb(IGeoIpDatabase):
         # format data
         try:
             ip_location.country = parsed_country
-            ip_location.region = parsed_location.split(',')[1].strip()
-            ip_location.city = parsed_location.split(',')[2].strip()
+            ip_location.region = parsed_region
+            ip_location.city = parsed_city
 
             parsed_coords = parsed_coords.split('(')[0].split(',')
             ip_location.latitude = float(parsed_coords[0].strip())
@@ -292,7 +296,7 @@ class Ip2LocationWeb(IGeoIpDatabase):
 class NeustarWeb(IGeoIpDatabase):
     """
     Class for accessing geolocation data provided by searching directly
-    on https://www.neustar.biz/resources/tools/ip-geolocation-lookup-tool/.
+    on https://www.security.neustar/resources/tools/ip-geolocation-lookup-tool/.
 
     """
 
@@ -300,7 +304,7 @@ class NeustarWeb(IGeoIpDatabase):
     def get(ip_address, api_key=None, db_path=None, username=None, password=None):
         # process request
         try:
-            request = requests.post('https://www.neustar.biz/resources/tools/ip-geolocation-lookup-tool',
+            request = requests.post('https://www.security.neustar/resources/tools/ip-geolocation-lookup-tool',
                                     headers={'User-Agent': 'Mozilla/5.0'},
                                     data=[('ip', ip_address)],
                                     timeout=62)
@@ -676,3 +680,72 @@ class Eurek(IGeoIpDatabase):
             ip_location.longitude = None
 
         return ip_location
+
+
+class Ipdata(IGeoIpDatabase):
+    """
+    Class for accessing geolocation data provided by https://ipdata.co/.
+
+    """
+
+    @staticmethod
+    def get(ip_address, api_key='test', db_path=None, username=None, password=None):
+        # process request
+        try:
+            request = requests.get('https://api.ipdata.co/' + quote(ip_address)
+                                   + '?api-key=' + quote(api_key),
+                                   timeout=62)
+        except:
+            raise ServiceError()
+
+        # check for HTTP errors
+        if request.status_code != 200 and request.status_code != 400:
+            if request.status_code == 401:
+                raise PermissionRequiredError()
+            elif request.status_code == 403:
+                raise LimitExceededError()
+            else:
+                raise ServiceError()
+
+        # parse content
+        try:
+            content = request.content.decode('utf-8')
+            content = json.loads(content)
+        except:
+            raise InvalidResponseError()
+
+        # check for errors
+        if content.get('message'):
+            if 'private IP address' in content['message']:
+                raise IpAddressNotFoundError(ip_address)
+            else:
+                raise InvalidRequestError()
+
+        # prepare return value
+        ip_location = IpLocation(ip_address)
+
+        # format data
+        if content['country_code'] == '':
+            ip_location.country = None
+        else:
+            ip_location.country = content['country_code']
+
+        if content['region'] == '':
+            ip_location.region = None
+        else:
+            ip_location.region = content['region']
+
+        if content['city'] == '':
+            ip_location.city = None
+        else:
+            ip_location.city = content['city']
+
+        if content['latitude'] != '-' and content['longitude'] != '-':
+            ip_location.latitude = float(content['latitude'])
+            ip_location.longitude = float(content['longitude'])
+        else:
+            ip_location.latitude = None
+            ip_location.longitude = None
+
+        return ip_location
+

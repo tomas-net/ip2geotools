@@ -21,6 +21,7 @@ import ip2geotools
 from ip2geotools.databases.noncommercial import DbIpCity, \
                                                 HostIP, \
                                                 Freegeoip, \
+                                                Ipstack, \
                                                 MaxMindGeoLite2City, \
                                                 Ip2Location
 from ip2geotools.databases.commercial import DbIpWeb, \
@@ -30,7 +31,8 @@ from ip2geotools.databases.commercial import DbIpWeb, \
                                              GeobytesCityDetails, \
                                              SkyhookContextAcceleratorIp, \
                                              IpInfo, \
-                                             Eurek
+                                             Eurek, \
+                                             Ipdata
 from ip2geotools.models import IpLocation
 from ip2geotools.errors import LocationError
 
@@ -58,11 +60,11 @@ class Command(object):
             description='{0} version {1}'.format(self.prog_name, ip2geotools.__version__) + \
                         '\n\n{0}'.format(ip2geotools.__description__),
             epilog=('\n\nexample:' + \
-                   '\n  get information on 147.229.2.90 from freegeoip.net in JSON format' + \
-                   '\n    {prog_name} 147.229.2.90 -d freegeoip -f json' + \
+                   '\n  get information on 147.229.2.90 from DB-IP API in JSON format' + \
+                   '\n    {prog_name} 147.229.2.90 -d dbipcity -f json' + \
                    '\n\nauthor:' + \
                    '\n  {prog_name} was written by {author} <{author_email}> ' + \
-                   'for master\'s thesis at FEEC BUT 2017/2018').format(
+                   'for master\'s thesis at FEEC BUT 2018/2019').format(
                        prog_name=self.prog_name,
                        author=ip2geotools.__author__,
                        author_email=ip2geotools.__author_email__),
@@ -84,6 +86,7 @@ class Command(object):
                                 'dbipcity',
                                 'hostip',
                                 'freegeoip',
+                                'ipstack',
                                 'maxmindgeolite2city',
                                 'ip2location',
 
@@ -96,6 +99,7 @@ class Command(object):
                                 'skyhookcontextacceleratorip',
                                 'ipinfo',
                                 'eurek',
+                                'ipdata',
                             ])
 
         parser.add_argument('--api_key',
@@ -141,12 +145,18 @@ class Command(object):
         try:
             # noncommercial databases
             if arguments.database == 'dbipcity':
-                ip_location = DbIpCity.get(arguments.IP_ADDRESS,
-                                           api_key=arguments.api_key)
+                if arguments.api_key:
+                    ip_location = DbIpCity.get(arguments.IP_ADDRESS,
+                                               api_key=arguments.api_key)
+                else:
+                    ip_location = DbIpCity.get(arguments.IP_ADDRESS)
             elif arguments.database == 'hostip':
                 ip_location = HostIP.get(arguments.IP_ADDRESS)
             elif arguments.database == 'freegeoip':
                 ip_location = Freegeoip.get(arguments.IP_ADDRESS)
+            elif arguments.database == 'ipstack':
+                ip_location = Ipstack.get(arguments.IP_ADDRESS,
+                                          api_key=arguments.api_key)
             elif arguments.database == 'maxmindgeolite2city':
                 ip_location = MaxMindGeoLite2City.get(arguments.IP_ADDRESS,
                                                       db_path=arguments.db_path)
@@ -174,6 +184,12 @@ class Command(object):
             elif arguments.database == 'eurek':
                 ip_location = Eurek.get(arguments.IP_ADDRESS,
                                         api_key=arguments.api_key)
+            elif arguments.database == 'ipdata':
+                if arguments.api_key:
+                    ip_location = Ipdata.get(arguments.IP_ADDRESS,
+                                               api_key=arguments.api_key)
+                else:
+                    ip_location = Ipdata.get(arguments.IP_ADDRESS)
 
             # print formatted output
             if arguments.format == 'json':

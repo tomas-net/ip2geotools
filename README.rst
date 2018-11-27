@@ -21,26 +21,26 @@ Basic usage
 
 .. code-block:: pycon
 
-    >>> from ip2geotools.databases.noncommercial import Freegeoip
-    >>> response = Freegeoip.get('147.229.2.90')
+    >>> from ip2geotools.databases.noncommercial import DbIpCity
+    >>> response = DbIpCity.get('147.229.2.90', api_key='free')
     >>> response.ip_address
     '147.229.2.90'
     >>> response.city
-    'Brno'
+    'Brno (Brno střed)'
     >>> response.region
     'South Moravian'
     >>> response.country
     'CZ'
     >>> response.latitude
-    49.2
+    49.1926824
     >>> response.longitude
-    16.6333
+    16.6182105
     >>> response.to_json()
-    '{"ip_address": "147.229.2.90", "city": "Brno", "region": "South Moravian", "country": "CZ", "latitude": 49.2, "longitude": 16.6333}'
+    '{"ip_address": "147.229.2.90", "city": "Brno (Brno st\u0159ed)", "region": "South Moravian", "country": "CZ", "latitude": 49.1926824, "longitude": 16.6182105}'
     >>> response.to_xml()
-    '<?xml version="1.0" encoding="UTF-8" ?><ip_location><ip_address>147.229.2.90</ip_address><city>Brno</city><region>South Moravian</region><country>CZ</country><latitude>49.2</latitude><longitude>16.6333</longitude></ip_location>'
+    '<?xml version="1.0" encoding="UTF-8" ?><ip_location><ip_address>147.229.2.90</ip_address><city>Brno (Brno střed)</city><region>South Moravian</region><country>CZ</country><latitude>49.1926824</latitude><longitude>16.6182105</longitude></ip_location>'
     >>> response.to_csv(',')
-    '147.229.2.90,Brno,South Moravian,CZ,49.2,16.6333'
+    '147.229.2.90,Brno (Brno střed),South Moravian,CZ,49.1926824,16.6182105'
 
 Command-line usage
 ------------------
@@ -49,7 +49,7 @@ When installed, you can invoke ``ip2geotools`` from the command-line:
 
 .. code:: bash
 
-    ip2geotools [-h] -d {dbipcity,hostip,freegeoip,maxmindgeolite2city,ip2location,dbipweb,maxmindgeoip2city,ip2locationweb,neustarweb,geobytescitydetails,skyhookcontextacceleratorip,ipinfo,eurek}
+    ip2geotools [-h] -d {dbipcity,hostip,freegeoip,ipstack,maxmindgeolite2city,ip2location,dbipweb,maxmindgeoip2city,ip2locationweb,neustarweb,geobytescitydetails,skyhookcontextacceleratorip,ipinfo,eurek,ipdata}
                        [--api_key API_KEY] [--db_path DB_PATH] [-u USERNAME]
                        [-p PASSWORD] [-f {json,xml,csv-space,csv-tab,inline}] [-v]
                        IP_ADDRESS
@@ -80,8 +80,8 @@ Examples:
 
 .. code:: bash
 
-    $ ip2geotools 147.229.2.90 -d freegeoip -f json
-    {"ip_address": "147.229.2.90", "city": "Brno", "region": "South Moravian", "country": "CZ", "latitude": 49.2, "longitude": 16.6333}
+    $ ip2geotools 147.229.2.90 -d dbipcity -f json
+    {"ip_address": "147.229.2.90", "city": "Brno (Brno st\u0159ed)", "region": "South Moravian", "country": "CZ", "latitude": 49.1926824, "longitude": 16.6182105}
 
 Models
 ------
@@ -138,9 +138,10 @@ Following classes access many different noncommercial and commercial geolocation
 
 * ``DbIpCity``: https://db-ip.com/api/
 * ``HostIP``: http://hostip.info/
-* ``Freegeoip``: http://freegeoip.net/
+* ``Freegeoip``: http://freegeoip.net/ **Database is deprecated!**
+* ``Ipstack``: https://ipstack.com/
 * ``MaxMindGeoLite2City``: https://dev.maxmind.com/geoip/geoip2/geolite2/
-* ``Ip2Location``: http://lite.ip2location.com/database/ip-country-region-city-latitude-longitude
+* ``Ip2Location``: https://lite.ip2location.com/database/ip-country-region-city-latitude-longitude
 
 ``ip2geotools.databases.commercial``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -152,6 +153,7 @@ Following classes access many different noncommercial and commercial geolocation
 * ``SkyhookContextAcceleratorIp``: http://www.skyhookwireless.com/
 * ``IpInfo``: https://ipinfo.io/
 * ``Eurek``: https://www.eurekapi.com/
+* ``Ipdata``: https://ipdata.co/
 
 Requirements
 ------------
@@ -172,4 +174,4 @@ License
 Author
 ------
 
-``ip2geotools`` was written by Tomas Caha <tomas-net at seznam dot cz> for master\'s thesis at `FEEC <http://www.feec.vutbr.cz/>`_ `BUT <https://www.vutbr.cz/>`_  2017/2018.
+``ip2geotools`` was written by Tomas Caha <tomas-net at seznam dot cz> for master\'s thesis at `FEEC <http://www.feec.vutbr.cz/>`_ `BUT <https://www.vutbr.cz/>`_  2018/2019.

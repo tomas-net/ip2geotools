@@ -28,7 +28,7 @@ class DbIpCity(IGeoIpDatabase):
     """
 
     @staticmethod
-    def get(ip_address, api_key="free", db_path=None, username=None, password=None):
+    def get(ip_address, api_key='free', db_path=None, username=None, password=None):
         # process request
         try:
             request = requests.get('http://api.db-ip.com/v2/'
@@ -37,7 +37,7 @@ class DbIpCity(IGeoIpDatabase):
                                    timeout=62)
         except:
             raise ServiceError()
-
+        
         # check for HTTP errors
         if request.status_code != 200:
             raise ServiceError()
@@ -149,18 +149,18 @@ class HostIP(IGeoIpDatabase):
 
         return ip_location
 
+
 class Freegeoip(IGeoIpDatabase):
     """
     Class for accessing geolocation data provided by http://freegeoip.net/.
-    
-    !!API of Freegeoip database is deprecated!!
+    Freegeoip database is deprecated!
 
     """
 
     @staticmethod
     def get(ip_address, api_key=None, db_path=None, username=None, password=None):
-        # process request
         """
+        # process request
         try:
             request = requests.get('http://freegeoip.net/json/' + quote(ip_address),
                                    timeout=62)
@@ -208,20 +208,25 @@ class Freegeoip(IGeoIpDatabase):
         else:
             ip_location.latitude = None
             ip_location.longitude = None
-        """        
-        raise ServiceError("API of Freegeoip database is deprecated!")
 
-class ipstack(IGeoIpDatabase):
+        return ip_location
+
+        """
+        raise ServiceError('Freegeoip database is deprecated!')
+
+
+class Ipstack(IGeoIpDatabase):
     """
     Class for accessing geolocation data provided by http://ipstack.com/.
 
     """
 
     @staticmethod
-    def get(ip_address, api_key, db_path=None, username=None, password=None):
+    def get(ip_address, api_key=None, db_path=None, username=None, password=None):
         # process request
         try:
-            request = requests.get('http://api.ipstack.com/' + quote(ip_address) + '?access_key=' + quote(api_key),
+            request = requests.get('http://api.ipstack.com/' + quote(ip_address)
+                                   + '?access_key=' + quote(api_key),
                                    timeout=62)
         except:
             raise ServiceError()
@@ -383,3 +388,4 @@ class Ip2Location(IGeoIpDatabase):
             ip_location.longitude = None
 
         return ip_location
+
