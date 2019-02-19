@@ -18,7 +18,8 @@ import IP2Location
 from ip2geotools.databases.interfaces import IGeoIpDatabase
 from ip2geotools.models import IpLocation
 from ip2geotools.errors import IpAddressNotFoundError, PermissionRequiredError, \
-                                InvalidRequestError, InvalidResponseError, ServiceError
+                                InvalidRequestError, InvalidResponseError, ServiceError, \
+                                LimitExceededError
 
 
 class DbIpCity(IGeoIpDatabase):
@@ -233,12 +234,7 @@ class Ipstack(IGeoIpDatabase):
 
         # check for HTTP errors
         if request.status_code != 200:
-            if request.status_code == 404:
-                raise IpAddressNotFoundError(ip_address)
-            elif request.status_code == 500:
-                raise InvalidRequestError()
-            else:
-                raise ServiceError()
+            raise ServiceError()
 
         # parse content
         try:
@@ -246,6 +242,17 @@ class Ipstack(IGeoIpDatabase):
             content = json.loads(content)
         except:
             raise InvalidResponseError()
+
+        # check for errors
+        if content.get('error'):
+            if content['error']['code'] == 101 \
+                or content['error']['code'] == 102 \
+                or content['error']['code'] == 105:
+                raise PermissionRequiredError()
+            elif content['error']['code'] == 104:
+                raise LimitExceededError()
+            else:
+                raise InvalidRequestError()
 
         # prepare return value
         ip_location = IpLocation(ip_address)

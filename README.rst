@@ -36,7 +36,7 @@ Basic usage
     >>> response.longitude
     16.6182105
     >>> response.to_json()
-    '{"ip_address": "147.229.2.90", "city": "Brno (Brno st\u0159ed)", "region": "South Moravian", "country": "CZ", "latitude": 49.1926824, "longitude": 16.6182105}'
+    '{"ip_address": "147.229.2.90", "city": "Brno (Brno střed)", "region": "South Moravian", "country": "CZ", "latitude": 49.1926824, "longitude": 16.6182105}'
     >>> response.to_xml()
     '<?xml version="1.0" encoding="UTF-8" ?><ip_location><ip_address>147.229.2.90</ip_address><city>Brno (Brno střed)</city><region>South Moravian</region><country>CZ</country><latitude>49.1926824</latitude><longitude>16.6182105</longitude></ip_location>'
     >>> response.to_csv(',')

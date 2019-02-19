@@ -1,3 +1,9 @@
+0.1.4 - 20-Feb-2019
+-------------------
+
+* Fix ``ip2geotools.databases.commercial.Ip2LocationWeb`` by using ``selenium`` with Firefox because of new webpage layout
+* Better exception handling in ``ip2geotools.databases.noncommercial.Ipstack``
+
 0.1.3 - 27-Nov-2018
 -------------------
 

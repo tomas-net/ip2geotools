@@ -14,6 +14,11 @@ import re
 import requests
 from requests.auth import HTTPBasicAuth
 import pyquery
+from selenium import webdriver # selenium for Ip2LocationWeb
+from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 from ip2geotools.databases.interfaces import IGeoIpDatabase
 from ip2geotools.models import IpLocation
@@ -198,24 +203,29 @@ class Ip2LocationWeb(IGeoIpDatabase):
 
     @staticmethod
     def get(ip_address, api_key=None, db_path=None, username=None, password=None):
-        # initial check for current limit
-        try:
-            request = requests.get('http://www.ip2location.com/demo/',
-                                   headers={'User-Agent': 'Mozilla/5.0'},
-                                   timeout=62)
-        except:
-            raise ServiceError()
+        # initiate headless Firefox using selenium to pass through Google reCAPTCHA
+        options = Options()
+        options.headless = True
+        browser = webdriver.Firefox(options=options)
 
-        # check for HTTP errors
-        if request.status_code != 200:
+        try:
+            browser.get('http://www.ip2location.com/demo/' + ip_address)
+            element = WebDriverWait(browser, 30).until(
+                EC.presence_of_element_located((By.NAME, 'ipAddress'))
+            )
+
+            if not element:
+                raise Exception
+        except:
             raise ServiceError()
 
         # parse current limit
         current_limit = 0
+        body = browser.find_element_by_tag_name('body').text
+
         try:
-            content = request.content.decode('utf-8')
             limit = re.search(r'You still have.*?([\d]{1,2})/50.* query limit',
-                              content,
+                              body,
                               re.DOTALL)
 
             if limit != None:
@@ -227,45 +237,20 @@ class Ip2LocationWeb(IGeoIpDatabase):
         if current_limit == 0:
             raise LimitExceededError()
 
-        # process request
-        try:
-            request = requests.post('http://www.ip2location.com/demo/',
-                                    headers={'User-Agent': 'Mozilla/5.0'},
-                                    data=[('ipAddress', ip_address)],
-                                    timeout=62)
-        except:
-            raise ServiceError()
-
-        # check for HTTP errors
-        if request.status_code != 200:
-            raise ServiceError()
-
         # parse content
         try:
-            content = request.content.decode('utf-8')
-            pq = pyquery.PyQuery(content)
-            parsed_ip = pq('html > body > div#main.container table:first tr:contains("IP Address") td:nth-child(2)') \
-                        .text() \
-                        .strip()
-            parsed_country = pq('html > body > div#main.container table:first tr:contains("Country") td:nth-child(2) img') \
-                             .attr('src') \
-                             .strip() \
-                             .replace('/images/flags/', '') \
-                             .replace('.png', '') \
-                             .upper()
-            parsed_region = pq('html > body > div#main.container table:first tr:contains("Region") td:nth-child(2)') \
-                              .eq(0) \
-                              .text() \
-                              .strip()
-            parsed_city = pq('html > body > div#main.container table:first tr:contains("City") td:nth-child(2)') \
-                              .eq(0) \
-                              .text() \
-                              .strip()
-            parsed_coords = pq('html > body > div#main.container table:first tr:contains("Latitude & Longitude of City") td:nth-child(2)') \
-                            .text() \
-                            .strip()
+            table = browser.find_element_by_xpath('//table[contains(.,"Permalink")]')
+
+            parsed_ip = table.find_element_by_xpath('//tr[contains(.,"IP Address")]/td').text.strip()
+            parsed_country = [class_name.replace('flag-icon-', '').upper() for class_name in table.find_element_by_class_name('flag-icon').get_attribute('class').split(' ') if class_name.startswith('flag-icon-')][0]
+            parsed_region = table.find_element_by_xpath('//tr[contains(.,"Region")]/td').text.strip()
+            parsed_city = table.find_element_by_xpath('//tr[contains(.,"City")]/td').text.strip()
+            parsed_coords = table.find_element_by_xpath('//tr[contains(.,"Coordinates of City")]/td').text.strip()
         except:
             raise InvalidResponseError()
+
+        # exit headless firefox
+        browser.quit()
 
         # check for errors
         if ip_address != parsed_ip:
