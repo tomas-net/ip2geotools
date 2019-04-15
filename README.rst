@@ -62,7 +62,7 @@ Where:
 
 * ``-h``, ``--help``: show help message and exit
 
-* ``-d {dbipcity,hostip,...,eurek}``: geolocation database to be used (case insesitive)
+* ``-d {dbipcity,hostip,...,ipdata}``: geolocation database to be used (case insesitive)
 
 * ``--api_key API_KEY``: API key for given geolocation database (if needed)
 
@@ -81,7 +81,7 @@ Examples:
 .. code:: bash
 
     $ ip2geotools 147.229.2.90 -d dbipcity -f json
-    {"ip_address": "147.229.2.90", "city": "Brno (Brno st\u0159ed)", "region": "South Moravian", "country": "CZ", "latitude": 49.1926824, "longitude": 16.6182105}
+    {"ip_address": "147.229.2.90", "city": "Brno (Brno střed)", "region": "South Moravian", "country": "CZ", "latitude": 49.1926824, "longitude": 16.6182105}
 
 Models
 ------

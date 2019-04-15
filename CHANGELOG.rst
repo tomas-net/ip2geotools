@@ -1,3 +1,9 @@
+0.1.5 - 15-Apr-2019
+-------------------
+
+* Fix ``ip2geotools.databases.commercial.NeustarWeb`` because of new URL
+* Updated ``requirements.txt``
+
 0.1.4 - 20-Feb-2019
 -------------------
 

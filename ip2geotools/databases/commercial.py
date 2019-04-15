@@ -281,7 +281,7 @@ class Ip2LocationWeb(IGeoIpDatabase):
 class NeustarWeb(IGeoIpDatabase):
     """
     Class for accessing geolocation data provided by searching directly
-    on https://www.security.neustar/resources/tools/ip-geolocation-lookup-tool/.
+    on https://www.home.neustar/resources/tools/ip-geolocation-lookup-tool/.
 
     """
 
@@ -289,7 +289,7 @@ class NeustarWeb(IGeoIpDatabase):
     def get(ip_address, api_key=None, db_path=None, username=None, password=None):
         # process request
         try:
-            request = requests.post('https://www.security.neustar/resources/tools/ip-geolocation-lookup-tool',
+            request = requests.post('https://www.home.neustar/resources/tools/ip-geolocation-lookup-tool',
                                     headers={'User-Agent': 'Mozilla/5.0'},
                                     data=[('ip', ip_address)],
                                     timeout=62)

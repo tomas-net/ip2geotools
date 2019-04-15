@@ -4,7 +4,7 @@
 __title__ = 'ip2geotools'
 __description__ = 'Simple tool for getting geolocation information on ' + \
                   'given IP address from various geolocation databases.'
-__version__ = '0.1.4'
+__version__ = '0.1.5'
 __author__ = 'Tomas Caha'
 __author_email__ = 'tomas-net@seznam.cz'
 __url__ = 'https://github.com/tomas-net/ip2geotools'
