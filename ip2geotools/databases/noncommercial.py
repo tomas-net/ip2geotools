@@ -63,14 +63,14 @@ class DbIpCity(IGeoIpDatabase):
         ip_location = IpLocation(ip_address)
 
         # format data
-        ip_location.country = content['countryCode']
-        ip_location.region = content['stateProv']
-        ip_location.city = content['city']
+        ip_location.country = content.get('countryCode')
+        ip_location.region = content.get('stateProv')
+        ip_location.city = content.get('city')
 
         # get lat/lon from OSM
-        osm = geocoder.osm(ip_location.city + ', '
-                           + ip_location.region + ' '
-                           + ip_location.country,
+        osm = geocoder.osm(content.get('city', '') + ', '
+                           + content.get('stateProv', '') + ' '
+                           + content.get('countryCode', ''),
                            timeout=62)
 
         if osm.ok:
@@ -78,7 +78,7 @@ class DbIpCity(IGeoIpDatabase):
             ip_location.latitude = float(osm['lat'])
             ip_location.longitude = float(osm['lng'])
         else:
-            osm = geocoder.osm(ip_location.city + ', ' + ip_location.country, timeout=62)
+            osm = geocoder.osm(content.get('city', '') + ', ' + content.get('countryCode', ''), timeout=62)
 
             if osm.ok:
                 osm = osm.json
@@ -127,19 +127,25 @@ class HostIP(IGeoIpDatabase):
         ip_location = IpLocation(ip_address)
 
         # format data
-        if content['country_code'] == 'XX':
-            ip_location.country = None
+        if content.get('country_code'):
+            if content['country_code'] == 'XX':
+                ip_location.country = None
+            else:
+                ip_location.country = content['country_code']
         else:
-            ip_location.country = content['country_code']
+            ip_location.country = None
 
         ip_location.region = None
 
-        if content['city'] == '(Unknown City?)' \
-           or content['city'] == '(Unknown city)' \
-           or content['city'] == '(Private Address)':
-            ip_location.city = None
+        if content.get('city'):
+            if content['city'] == '(Unknown City?)' \
+            or content['city'] == '(Unknown city)' \
+            or content['city'] == '(Private Address)':
+                ip_location.city = None
+            else:
+                ip_location.city = content['city']
         else:
-            ip_location.city = content['city']
+            ip_location.city = None
 
         if content.get('lat') and content.get('lng'):
             ip_location.latitude = float(content['lat'])
@@ -258,24 +264,17 @@ class Ipstack(IGeoIpDatabase):
         ip_location = IpLocation(ip_address)
 
         # format data
-        if content['country_code'] == '':
-            ip_location.country = None
-        else:
-            ip_location.country = content['country_code']
+        ip_location.country = content.get('country_code')
+        ip_location.region = content.get('region_name')
+        ip_location.city = content.get('city')
 
-        if content['region_name'] == '':
-            ip_location.region = None
-        else:
-            ip_location.region = content['region_name']
-
-        if content['city'] == '':
-            ip_location.city = None
-        else:
-            ip_location.city = content['city']
-
-        if content['latitude'] != '-' and content['longitude'] != '-':
-            ip_location.latitude = float(content['latitude'])
-            ip_location.longitude = float(content['longitude'])
+        if content.get('latitude') and content.get('longitude'):
+            if content['latitude'] != '-' and content['longitude'] != '-':
+                ip_location.latitude = float(content['latitude'])
+                ip_location.longitude = float(content['longitude'])
+            else:
+                ip_location.latitude = None
+                ip_location.longitude = None
         else:
             ip_location.latitude = None
             ip_location.longitude = None

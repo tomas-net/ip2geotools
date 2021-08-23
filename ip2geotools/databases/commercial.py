@@ -155,19 +155,13 @@ class MaxMindGeoIp2City(IGeoIpDatabase):
 
         # format data
         if content.get('country'):
-            if content['country'].get('iso_code'):
-                ip_location.country = content['country']['iso_code']
-            else:
-                ip_location.country = None
+            ip_location.country = content['country'].get('iso_code')
         else:
             ip_location.country = None
 
         if content.get('subdivisions'):
             if content['subdivisions'][0].get('names'):
-                if content['subdivisions'][0]['names'].get('en'):
-                    ip_location.region = content['subdivisions'][0]['names']['en']
-                else:
-                    ip_location.region = None
+                ip_location.region = content['subdivisions'][0]['names'].get('en')
             else:
                 ip_location.region = None
         else:
@@ -175,10 +169,7 @@ class MaxMindGeoIp2City(IGeoIpDatabase):
 
         if content.get('city'):
             if content['city'].get('names'):
-                if content['city']['names'].get('en'):
-                    ip_location.city = content['city']['names']['en']
-                else:
-                    ip_location.city = None
+                ip_location.city = content['city']['names'].get('en')
             else:
                 ip_location.city = None
         else:
@@ -397,20 +388,9 @@ class GeobytesCityDetails(IGeoIpDatabase):
         ip_location = IpLocation(ip_address)
 
         # format data
-        if content.get('geobytesinternet'):
-            ip_location.country = content['geobytesinternet']
-        else:
-            ip_location.country = None
-
-        if content.get('geobytesregion'):
-            ip_location.region = content['geobytesregion']
-        else:
-            ip_location.region = None
-
-        if content.get('geobytescity'):
-            ip_location.city = content['geobytescity']
-        else:
-            ip_location.city = None
+        ip_location.country = content.get('geobytesinternet')
+        ip_location.region = content.get('geobytesregion')
+        ip_location.city = content.get('geobytescity')
 
         if content.get('geobyteslatitude') and content.get('geobyteslongitude'):
             ip_location.latitude = float(content['geobyteslatitude'])
@@ -472,20 +452,9 @@ class SkyhookContextAcceleratorIp(IGeoIpDatabase):
         # format data
         if content.get('data'):
             if content['data'].get('civic'):
-                if content['data']['civic'].get('countryIso'):
-                    ip_location.country = content['data']['civic']['countryIso']
-                else:
-                    ip_location.country = None
-
-                if content['data']['civic'].get('state'):
-                    ip_location.region = content['data']['civic']['state']
-                else:
-                    ip_location.region = None
-
-                if content['data']['civic'].get('city'):
-                    ip_location.city = content['data']['civic']['city']
-                else:
-                    ip_location.city = None
+                ip_location.country = content['data']['civic'].get('countryIso')
+                ip_location.region = content['data']['civic'].get('state')
+                ip_location.city = content['data']['civic'].get('city')
             else:
                 ip_location.country = None
                 ip_location.region = None
@@ -549,21 +518,10 @@ class IpInfo(IGeoIpDatabase):
         ip_location = IpLocation(ip_address)
 
         # format data
-        if content.get('country'):
-            ip_location.country = content['country']
-        else:
-            ip_location.country = None
-
-        if content.get('region'):
-            ip_location.region = content['region']
-        else:
-            ip_location.region = None
-
-        if content.get('city'):
-            ip_location.city = content['city']
-        else:
-            ip_location.city = None
-
+        ip_location.country = content.get('country')        
+        ip_location.region = content.get('region')
+        ip_location.city = content.get('city')
+        
         if content.get('loc'):
             location = content['loc'].split(',')
             ip_location.latitude = float(location[0])
@@ -635,21 +593,10 @@ class Eurek(IGeoIpDatabase):
 
         # format data
         if content.get('geolocation_data'):
-            if content['geolocation_data'].get('country_code_iso3166alpha2'):
-                ip_location.country = content['geolocation_data']['country_code_iso3166alpha2']
-            else:
-                ip_location.country = None
-
-            if content['geolocation_data'].get('region_name'):
-                ip_location.region = content['geolocation_data']['region_name']
-            else:
-                ip_location.region = None
-
-            if content['geolocation_data'].get('city'):
-                ip_location.city = content['geolocation_data']['city']
-            else:
-                ip_location.city = None
-
+            ip_location.country = content['geolocation_data'].get('country_code_iso3166alpha2')
+            ip_location.region = content['geolocation_data'].get('region_name')
+            ip_location.city = content['geolocation_data'].get('city')
+            
             if content['geolocation_data'].get('latitude') \
                and content['geolocation_data'].get('longitude'):
                 ip_location.latitude = float(content['geolocation_data']['latitude'])

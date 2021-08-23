@@ -174,4 +174,4 @@ License
 Author
 ------
 
-``ip2geotools`` was written by Tomas Caha <tomas-net at seznam dot cz> for master\'s thesis at `FEEC <http://www.feec.vutbr.cz/>`_ `BUT <https://www.vutbr.cz/>`_  2018/2019.
+``ip2geotools`` was written by Tomas Caha <tomas-net at seznam dot cz> / <tomas.caha1 at vut dot cz> at `FEEC <http://www.feec.vutbr.cz/>`_ `BUT <https://www.vutbr.cz/>`_.

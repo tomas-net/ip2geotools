@@ -1,3 +1,8 @@
+0.1.6 - 24-Aug-2021
+-------------------
+
+* Fix when some geolocation information is not provided by database provider
+
 0.1.5 - 15-Apr-2019
 -------------------
 

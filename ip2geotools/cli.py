@@ -63,8 +63,8 @@ class Command(object):
                    '\n  get information on 147.229.2.90 from DB-IP API in JSON format' + \
                    '\n    {prog_name} 147.229.2.90 -d dbipcity -f json' + \
                    '\n\nauthor:' + \
-                   '\n  {prog_name} was written by {author} <{author_email}> ' + \
-                   'for master\'s thesis at FEEC BUT 2018/2019').format(
+                   '\n  {prog_name} was written by {author} <{author_email}> / <tomas.caha1@vut.cz>' + \
+                   ' at FEEC BUT').format(
                        prog_name=self.prog_name,
                        author=ip2geotools.__author__,
                        author_email=ip2geotools.__author_email__),
